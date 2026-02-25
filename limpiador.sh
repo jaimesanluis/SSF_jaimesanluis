@@ -1,12 +1,18 @@
 #!/bin/bash
 
-directorio_actual=$(pwd)
+DIR="${1:-$(pwd)}"
 
-mkdir -p "$directorio_actual"/IMGS
-mkdir -p "$directorio_actual"/DOCS
-mkdir -p "$directorio_actual"/TXTS
-mkdir -p "$directorio_actual"/PDFS
-mkdir -p "$directorio_actual"/VACIOS
+if [ ! -d "$DIR" ]; then
+    echo "Error: el directorio no existe."
+    exit 1
+fi
+
+cd "$DIR" || exit
+
+echo "Ordenando archivos en: $DIR"
+echo "--------------------------------"
+
+mkdir -p IMGS DOCS TXTS PDFS VACIOS
 
 imgs=0
 docs=0
@@ -14,52 +20,84 @@ txts=0
 pdfs=0
 vacios=0
 
-for archivo in "$directorio_actual"/*; do
+for f in *; do
+    [ -e "$f" ] || continue
 
-    if [[ -f "$archivo" ]]; then
+    case "$f" in
+        IMGS|DOCS|TXTS|PDFS|VACIOS|kaos.sh)
+            continue
+        ;;
+    esac
 
-        if [[ ! -s "$archivo" ]]; then
-            mv "$archivo" "$directorio_actual"/VACIOS/
+    if [ -f "$f" ]; then
+        
+        if [ ! -s "$f" ]; then
+            mv "$f" VACIOS/
             ((vacios++))
             continue
         fi
 
-        case "$archivo" in
+        case "${f,,}" in
             *.jpg|*.png|*.gif)
-                mv "$archivo" "$directorio_actual"/IMGS/
+                mv "$f" IMGS/
                 ((imgs++))
-                ;;
+            ;;
             *.docx|*.odt)
-                mv "$archivo" "$directorio_actual"/DOCS/
+                mv "$f" DOCS/
                 ((docs++))
-                ;;
+            ;;
             *.txt)
-                mv "$archivo" "$directorio_actual"/TXTS/
+                mv "$f" TXTS/
                 ((txts++))
-                ;;
+            ;;
             *.pdf)
-                mv "$archivo" "$directorio_actual"/PDFS/
+                mv "$f" PDFS/
                 ((pdfs++))
-                ;;
+            ;;
         esac
     fi
 done
 
-echo "Imágenes: $imgs"
-echo "Documentos: $docs"
-echo "Textos: $txts"
-echo "PDFs: $pdfs"
-echo "Vacíos: $vacios"
 echo
-read -p "¿Deseas eliminar definitivamente los archivos y carpetas vacías? (s/n): " respuesta
+echo "Buscando elementos vacíos..."
 
-if [[ "$respuesta" =~ ^[Ss]$ ]]; then
-    
-    find "$directorio_actual" -type f -empty -delete
-    
-    find "$directorio_actual" -type d -empty -delete
-    
-    echo "Elementos vacíos eliminados."
-else
-    echo "No se eliminaron elementos vacíos."
+empty_files=$(find . -type f -empty)
+empty_dirs=$(find . -type d -empty)
+
+total_empty=$(echo "$empty_files $empty_dirs" | wc -w)
+
+echo
+echo "========= INFORME ========="
+echo "Imágenes movidas : $imgs"
+echo "Documentos movidos : $docs"
+echo "TXT movidos : $txts"
+echo "PDF movidos : $pdfs"
+echo "Archivos vacíos movidos : $vacios"
+echo "Elementos vacíos encontrados : $total_empty"
+echo "==========================="
+
+if [ "$total_empty" -gt 0 ]; then
+
+    echo
+    echo "Elementos vacíos encontrados:"
+
+    [ -n "$empty_files" ] && \
+        echo "Archivos vacíos:" && echo "$empty_files"
+
+    [ -n "$empty_dirs" ] && \
+        echo "Carpetas vacías:" && echo "$empty_dirs"
+
+    echo
+    read -p "¿Deseas eliminarlos? (s/n): " resp
+
+    if [[ "$resp" =~ ^[sS]$ ]]; then
+        find . -type f -empty -delete
+        find . -type d -empty -delete
+        echo "Elementos vacíos eliminados."
+    else
+        echo "No se eliminaron elementos."
+    fi
 fi
+
+echo
+echo "Proceso finalizado"
