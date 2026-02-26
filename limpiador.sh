@@ -10,7 +10,6 @@ fi
 cd "$DIR" || exit
 
 echo "Ordenando archivos en: $DIR"
-echo "--------------------------------"
 
 mkdir -p IMGS DOCS TXTS PDFS VACIOS
 
@@ -66,15 +65,13 @@ empty_dirs=$(find . -type d -empty)
 
 total_empty=$(echo "$empty_files $empty_dirs" | wc -w)
 
-echo
-echo "========= INFORME ========="
-echo "Imágenes movidas : $imgs"
+
+echo "Imagenes movidas : $imgs"
 echo "Documentos movidos : $docs"
 echo "TXT movidos : $txts"
 echo "PDF movidos : $pdfs"
 echo "Archivos vacíos movidos : $vacios"
 echo "Elementos vacíos encontrados : $total_empty"
-echo "==========================="
 
 if [ "$total_empty" -gt 0 ]; then
 

@@ -2,15 +2,15 @@
 
 set -euo pipefail
 
-read -p "Introduzca la base: " base
-read -p "Introduzca la altura: " altura
+read -p "introduzca la base: " base
+read -p "introduzca la altura: " altura
 
 area=$((base * altura))
 
 echo ""
-echo "Área del rectángulo: $area"
+echo "area del rectangulo: $area"
 echo ""
-echo "Dibujo del rectángulo:"
+echo "dibujo del rectangulo:"
 echo ""
 
 for ((i=1; i<=altura; i++))

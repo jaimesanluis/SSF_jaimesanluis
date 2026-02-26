@@ -4,16 +4,16 @@ set -euo pipefail
 
 while true
 do
-    echo "Introduce contraseña:"
-    read pass1
+    echo "introduce contraseña:"
+    read -s pass1
 
-    echo "Confirma contraseña:"
-    read pass2
+    echo "confirma contraseña:"
+    read -s pass2
 
     if [ "$pass1" = "$pass2" ]; then
-        echo "OK"
+        echo "ok"
         break
     else
-        echo "Error no coinciden"
+        echo "error no coinciden"
     fi
 done
